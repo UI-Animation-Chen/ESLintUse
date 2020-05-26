@@ -12,7 +12,8 @@ if (process.platform === 'win32') {
 
 const childProcess = require('child_process');
 
-const gitCmdStr = 'git diff --cached --numstat --name-only';
+// --diff-filter=ACMR 过滤掉删除的文件，参考man git-diff中的--diff-filter选项
+const gitCmdStr = 'git diff --cached --numstat --name-only --diff-filter=ACMR';
 const files = childProcess.execSync(gitCmdStr).toString().replace(/[\r|\n]/g, ' ');
 
 let filesToLint = '';

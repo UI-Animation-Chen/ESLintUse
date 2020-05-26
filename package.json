@@ -4,7 +4,7 @@
   "description": "eslint demo",
   "main": "index.js",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint --no-eslintrc -c eslintrc.json --ext .js ./"
+    "lint": "node pre-commit-eslint.js"
   },
   "keywords": [
     "eslint"
