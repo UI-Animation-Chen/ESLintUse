@@ -1,8 +1,8 @@
 /*
- * 对执行git add后的文件，执行eslint检查。
+ * 从上次merge起，所有的改动文件执行eslint检查。
  */
 
-console.log('--- pre-commit lint start ---');
+console.log('--- eslint-diff-from-last-merge start ---');
 
 if (process.platform === 'win32') {
     console.log('--- win32 platform ---');
@@ -12,10 +12,19 @@ if (process.platform === 'win32') {
 
 const childProcess = require('child_process');
 
+const gitLogCmdStr = 'git log --merges -n 1 --pretty=format:"%H"';
+const lastMergeCommitId = childProcess.execSync(gitLogCmdStr);
+if (!lastMergeCommitId) {
+    console.log('--- no last merge commit ---');
+    process.exit(0);
+}
+
 // --diff-filter=ACMR 过滤掉删除的文件，参考man git-diff中的--diff-filter选项
-const gitCmdStr = 'git diff --cached --numstat --name-only --diff-filter=ACMR';
+let gitDiffCmdStr = 'git diff --numstat --name-only --diff-filter=ACMR ';
+gitDiffCmdStr += lastMergeCommitId;
+gitDiffCmdStr += ' HEAD';
 const files = childProcess
-    .execSync(gitCmdStr)
+    .execSync(gitDiffCmdStr)
     .toString()
     .replace(/[\r|\n]/g, ' ');
 
@@ -58,8 +67,8 @@ try {
     );
 } catch (err) {
     console.log('---', err.toString());
-    console.log('--- pre-commit lint end ---');
+    console.log('--- eslint-diff-from-last-merge end ---');
     process.exit(1);
 }
 
-console.log('--- pre-commit lint end ---');
+console.log('--- eslint-diff-from-last-merge end ---');
